@@ -1,0 +1,9 @@
+/* On initaialise tailwind css  */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Style sur le body  */
+body {
+  background: #ebebeb;
+}
