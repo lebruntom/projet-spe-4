@@ -8,7 +8,6 @@ import session from "express-session";
 import GoogleStrategy from "passport-google-oauth20";
 import GitHubStrategy from "passport-github2";
 import cookieParser from "cookie-parser";
-import blogRoute from "./modules/blog/blogRoute.js";
 
 const app = express();
 app.use(bodyParser.json());
@@ -35,13 +34,12 @@ db.serialize(() => {
 //Création de la table blog si elle n'existe pas
 db.serialize(() => {
     db.run(`
-      CREATE TABLE IF NOT EXISTS blog (
+      CREATE TABLE IF NOT EXISTS files (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT NOT NULL,
-        status INTEGER DEFAULT 0,
         title TEXT NOT NULL,
-        subject TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        description TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       )
     `);
 });
@@ -103,7 +101,6 @@ passport.deserializeUser((user, done) => {
 
 //Appel des routes auth
 app.use(authRoute);
-app.use(blogRoute);
 
 const PORT = 8000;
 app.listen(PORT, () => {
