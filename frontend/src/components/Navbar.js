@@ -53,25 +53,16 @@ const Navbar = () => {
                 Accueil
               </Link>
             </li>
-            <li>
-              <Link
-                to={"/blog"}
-                className="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 md:text-gray-900"
-                aria-current="page"
-              >
-                Blog
-              </Link>
-            </li>
             {/* si le user est connecté on affiche  */}
             {currentUser && (
               <>
                 <li>
                   <Link
-                    to={"/blogPrivate"}
+                    to={"/documents"}
                     className="block py-2 px-3 text-white rounded md:bg-transparent  md:p-0  md:text-gray-900"
                     aria-current="page"
                   >
-                    Blogs privés
+                    Documents
                   </Link>
                 </li>
                 <li>
