@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import DocumentEditor from "./pages/DocumentEditor";
+import Documents from "./pages/Documents";
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import { AuthContext } from "./store/AuthContext";
 import { useContext } from "react";
@@ -47,8 +48,9 @@ function App() {
 
         {/* Création des routes protégées (accessible que quand on est connecté) */}
         <Route element={<ProtectedRoute />}>
-        <Route path="/documents" element={<Navigate to={`/docs/${uuidV4()}`} />} />
+        <Route path="/create" element={<Navigate to={`/docs/${uuidV4()}`} />} />
         <Route path="/docs/:id" element={<DocumentEditor />} />
+        <Route path="/documents" element={<Documents />} />
         </Route>
 
         {/* routes acessible sans autorisation */}

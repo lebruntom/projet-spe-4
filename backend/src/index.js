@@ -47,6 +47,18 @@ db.serialize(() => {
     `);
 });
 
+db.serialize(() => {
+    db.run(`
+      CREATE TABLE IF NOT EXISTS user_documents (
+        user_id INTEGER,
+        document_id TEXT,
+        PRIMARY KEY (user_id, document_id),
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        FOREIGN KEY (document_id) REFERENCES documents(id)
+      )
+    `);
+  });
+
 app.use(
   session({
     secret: "azertyuiop",

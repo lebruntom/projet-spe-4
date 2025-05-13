@@ -53,7 +53,7 @@ export async function loginUserController(req, res) {
         const {email, password} = req.body;
         //On verifie les infos
         const result = await loginUser(email, password);
-
+        const id = result.id;
         //Si ca reusssi on créé le token
         if (result.success) {
             //On supprime l'email de la liste noire
@@ -62,6 +62,7 @@ export async function loginUserController(req, res) {
             const token = jwt.sign(
                 {
                     loggedIn: true,
+                    id: id,
                     email: email,
                 },
                 secretKey,

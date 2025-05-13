@@ -19,9 +19,9 @@ export const AuthProvider = ({ children }) => {
         try {
           //S'il est valide il renvoi le token donc on peut le decoder
           const decoded = jwtDecode(res.data.token);
-          if (decoded.email) {
+          if (decoded.email && decoded.id) {
             //Si on arrive a le decoder et qu'il contient un email on rempli le contexte
-            setCurrentUser({ email: decoded.email });
+            setCurrentUser({ email: decoded.email, id: decoded.id });
           } else {
             //Sinon contexte à null (donc user pas connecté)
             setCurrentUser(null);
