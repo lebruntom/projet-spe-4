@@ -2,10 +2,12 @@ import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { CiLogin, CiLogout } from "react-icons/ci";
 import { AuthContext } from "../store/AuthContext";
+import { useCookies } from "react-cookie";
 
 const Navbar = () => {
   // Récuperation du context
   const { currentUser } = useContext(AuthContext);
+  const [cookies] = useCookies();
 
   return (
     <nav className="bg-white border-gray-200">
@@ -54,7 +56,7 @@ const Navbar = () => {
               </Link>
             </li>
             {/* si le user est connecté on affiche  */}
-            {currentUser && (
+            {currentUser && cookies.doubleAuth && (
               <>
                 <li>
                   <Link

@@ -1,18 +1,23 @@
-import { getOrCreateDocument, updateDocument } from './modules/document/documentService.js';
+import {
+  getOrCreateDocument,
+  updateDocument,
+} from "./modules/document/documentService.js";
 
 function setupSocket(io) {
-  io.on('connection', (socket) => {
-    socket.on('get-document', async (documentId) => {
-      const document = await getOrCreateDocument(documentId);
+  io.on("connection", (socket) => {
+    socket.on("get-document", async (documentId, userId) => {
+      const document = await getOrCreateDocument(documentId, userId);
       socket.join(documentId);
-      socket.emit('load-document', document.data);
+      socket.join(userId);
 
-      socket.on('send-changes', (delta) => {
-        socket.broadcast.to(documentId).emit('receive-changes', delta);
+      socket.emit("load-document", document.data, document.title);
+
+      socket.on("send-changes", (delta, title) => {
+        socket.broadcast.to(documentId).emit("receive-changes", delta, title);
       });
 
-      socket.on('save-document', async data => {
-        await updateDocument(documentId, data);
+      socket.on("save-document", async (data, title, userId) => {
+        await updateDocument(documentId, data, title, userId);
       });
     });
   });

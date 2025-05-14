@@ -41,14 +41,18 @@ db.serialize(() => {
       CREATE TABLE IF NOT EXISTS documents (
         id TEXT PRIMARY KEY,
         data TEXT NOT NULL,
+        title TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        user_id_last_update INTEGER,
+        FOREIGN KEY (user_id_last_update) REFERENCES users(id)
+
       )
     `);
 });
 
 db.serialize(() => {
-    db.run(`
+  db.run(`
       CREATE TABLE IF NOT EXISTS user_documents (
         user_id INTEGER,
         document_id TEXT,
@@ -57,7 +61,7 @@ db.serialize(() => {
         FOREIGN KEY (document_id) REFERENCES documents(id)
       )
     `);
-  });
+});
 
 app.use(
   session({

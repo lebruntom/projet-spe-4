@@ -7,7 +7,7 @@ import Documents from "./pages/Documents";
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import { AuthContext } from "./store/AuthContext";
 import { useContext } from "react";
-import { v4 as uuidV4 } from 'uuid';
+import { v4 as uuidV4 } from "uuid";
 
 const ProtectedRoute = () => {
   const { currentUser } = useContext(AuthContext);
@@ -28,7 +28,7 @@ const NoAuthRoute = () => {
   //Si on a pas de currentUser (si le user n'est pas connecté)
   // retour a la page de connexion
   if (currentUser) {
-    return <Navigate to="/account" replace />;
+    return <Navigate to="/" replace />;
   }
 
   //Sinon on affiche la page souhaitée
@@ -48,9 +48,12 @@ function App() {
 
         {/* Création des routes protégées (accessible que quand on est connecté) */}
         <Route element={<ProtectedRoute />}>
-        <Route path="/create" element={<Navigate to={`/docs/${uuidV4()}`} />} />
-        <Route path="/docs/:id" element={<DocumentEditor />} />
-        <Route path="/documents" element={<Documents />} />
+          <Route
+            path="/create"
+            element={<Navigate to={`/docs/${uuidV4()}`} />}
+          />
+          <Route path="/docs/:id" element={<DocumentEditor />} />
+          <Route path="/documents" element={<Documents />} />
         </Route>
 
         {/* routes acessible sans autorisation */}

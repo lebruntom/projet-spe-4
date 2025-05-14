@@ -1,34 +1,49 @@
-import {db} from "../../index.js";
+import { db } from "../../index.js";
 
-export function getOrCreateDocument (id) {
+export function getOrCreateDocument(id, userId) {
   return new Promise((resolve, reject) => {
-    db.get('SELECT * FROM documents WHERE id = ?', [id], (err, row) => {
+    db.get("SELECT * FROM documents WHERE id = ?", [id], (err, row) => {
       if (err) return reject(err);
       if (row) {
-        return resolve({ id: row.id, data: JSON.parse(row.data) });
-      } else {
-        db.run('INSERT INTO documents (id, data) VALUES (?, ?)', [id, JSON.stringify({})], (err) => {
-          if (err) return reject(err);
-          return resolve({ id, data: {} });
+        return resolve({
+          id: row.id,
+          data: JSON.parse(row.data),
+          title: row.title,
         });
+      } else {
+        db.run(
+          "INSERT INTO documents (id, data, user_id_last_update) VALUES (?, ?, ?)",
+          [id, JSON.stringify({}), userId],
+          (err) => {
+            if (err) return reject(err);
+            return resolve({ id, data: {}, title: "" });
+          }
+        );
+        addUserToDocument(userId, id);
       }
     });
   });
-};
+}
 
-export function updateDocument (id, data) {
+export function updateDocument(id, data, title, userId) {
+  console.log("updateDocument", id, data, title, userId);
+
   return new Promise((resolve, reject) => {
-    db.run('UPDATE documents SET data = ? WHERE id = ?', [JSON.stringify(data), id], (err) => {
-      if (err) return reject(err);
-      resolve();
-    });
+    db.run(
+      "UPDATE documents SET data = ?, title= ?, user_id_last_update = ? WHERE id = ?",
+      [JSON.stringify(data), title, userId, id],
+      (err) => {
+        if (err) return reject(err);
+        resolve();
+      }
+    );
   });
-};
+}
 
 export function addUserToDocument(userId, documentId) {
   return new Promise((resolve, reject) => {
     db.run(
-      'INSERT OR IGNORE INTO user_documents (user_id, document_id) VALUES (?, ?)',
+      "INSERT OR IGNORE INTO user_documents (user_id, document_id) VALUES (?, ?)",
       [userId, documentId],
       (err) => {
         if (err) return reject(err);
@@ -42,6 +57,7 @@ export function getUsersForDocument(documentId) {
   return new Promise((resolve, reject) => {
     db.all(
       `SELECT users.* FROM users
+      inner join user on user.id = documents.user_id_last_update
        INNER JOIN user_documents ON users.id = user_documents.user_id
        WHERE user_documents.document_id = ?`,
       [documentId],
@@ -56,7 +72,8 @@ export function getUsersForDocument(documentId) {
 export function getDocumentsForUser(userId) {
   return new Promise((resolve, reject) => {
     db.all(
-      `SELECT documents.* FROM documents
+      `SELECT documents.*, users.email FROM documents
+      INNER JOIN users on users.id = documents.user_id_last_update
        INNER JOIN user_documents ON documents.id = user_documents.document_id
        WHERE user_documents.user_id = ?`,
       [userId],
@@ -67,4 +84,3 @@ export function getDocumentsForUser(userId) {
     );
   });
 }
-

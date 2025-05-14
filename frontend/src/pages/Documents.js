@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useContext } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../store/AuthContext';
-import Button from '../components/ui/Button';
+import React, { useEffect, useState, useContext } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../store/AuthContext";
+import Button from "../components/ui/Button";
 
 export default function Documents() {
   const [documents, setDocuments] = useState([]);
@@ -20,25 +20,32 @@ export default function Documents() {
         setDocuments(res.data);
       })
       .catch((err) => {
-        console.error('Erreur récupération documents', err);
+        console.error("Erreur récupération documents", err);
       });
   }, [currentUser]);
 
   const openDocument = (id) => {
-    navigate(`/documents/${id}`);
+    navigate(`../../../docs/${id}`);
   };
 
   return (
     <div>
       <h2>Mes documents</h2>
-      <Button className="bg-green-500 hover:bg-green-700 text-white" onClick={() => navigate('/create')}>Créer un document</Button>
+      <Button
+        className="bg-green-500 hover:bg-green-700 text-white"
+        onClick={() => navigate("/create")}
+      >
+        Créer un document
+      </Button>
       {documents.length === 0 ? (
         <p>Aucun document partagé avec vous.</p>
       ) : (
         <ul>
           {documents.map((doc) => (
-            <li key={doc.id}>
+            <li key={doc.id} className="flex justify-between items-center">
               <strong>{doc.id}</strong>
+              <strong>{doc.title}</strong>
+              <strong>{doc.email}</strong>
               <button onClick={() => openDocument(doc.id)}>Ouvrir</button>
             </li>
           ))}
