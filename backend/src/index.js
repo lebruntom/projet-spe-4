@@ -9,6 +9,7 @@ import GoogleStrategy from "passport-google-oauth20";
 import GitHubStrategy from "passport-github2";
 import cookieParser from "cookie-parser";
 import documentRoutes from "./modules/document/documentRoute.js";
+import folderRoutes from "./modules/folder/folderRoute.js";
 import { Server } from "socket.io";
 import setupSocket from "./socket.js";
 import http from "http";
@@ -35,6 +36,17 @@ db.serialize(() => {
   );
 });
 
+db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS folders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    parent_id INTEGER,
+    user_id INTEGER,
+    FOREIGN KEY (parent_id) REFERENCES folders(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`)
+})
+
 //Création de la table blog si elle n'existe pas
 db.serialize(() => {
   db.run(`
@@ -42,9 +54,11 @@ db.serialize(() => {
         id TEXT PRIMARY KEY,
         data TEXT NOT NULL,
         title TEXT,
+        folder_id INTEGER,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         user_id_last_update INTEGER,
+        FOREIGN KEY (folder_id) REFERENCES folders(id),
         FOREIGN KEY (user_id_last_update) REFERENCES users(id)
 
       )
@@ -121,6 +135,7 @@ passport.deserializeUser((user, done) => {
 //Appel des routes auth
 app.use(authRoute);
 app.use(documentRoutes);
+app.use(folderRoutes);
 
 const server = http.createServer(app);
 const io = new Server(server, {
