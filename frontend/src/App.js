@@ -7,6 +7,7 @@ import Documents from "./pages/Documents";
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import { AuthContext } from "./store/AuthContext";
 import { useContext } from "react";
+import Account from "./pages/Account";
 
 const ProtectedRoute = () => {
   const { currentUser } = useContext(AuthContext);
@@ -50,6 +51,7 @@ function App() {
           <Route path="/docs/:id" element={<DocumentEditor />} />
           <Route path="/documents" element={<Documents />} />
           <Route path="/documents/*" element={<Documents />} />
+          <Route path="/account" element={<Account />} />
         </Route>
 
         {/* routes acessible sans autorisation */}
