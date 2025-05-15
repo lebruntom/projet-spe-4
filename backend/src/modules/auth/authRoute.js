@@ -9,8 +9,11 @@ import {
     verifyDoubleAuthentification,
     logoutController,
     qrCodeStatusController,
+    changePasswordController
 } from "./authController.js";
 import passport from "passport";
+
+
 
 //On initialise
 const authRoute = express.Router();
@@ -29,6 +32,8 @@ authRoute.get("/userIsLogged", userIsLoggedController);
 authRoute.get("/qrCodeStatus", qrCodeStatusController);
 //Deconnexion
 authRoute.get("/logout", logoutController);
+//Change le mot de passe
+authRoute.post("/change-password", changePasswordController);
 
 // auth avec google
 authRoute.get(

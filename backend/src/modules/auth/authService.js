@@ -2,6 +2,7 @@
 import bcrypt from "bcrypt";
 import { db } from "../../index.js";
 import { authenticator } from "otplib";
+import { updateUserPassword } from "../user/userService.js";
 
 //Regarde si l'email en parametre existe en bdd
 export async function checkUserExists(email) {
@@ -134,4 +135,25 @@ export function qrCodeStatus(email) {
       }
     });
   });
+}
+
+export async function changeUserPassword(email, currentPassword, newPassword) {
+  const user = await checkUserExists(email);
+  if (!user) {
+    throw new Error("Utilisateur introuvable");
+  }
+
+  if (!user.password) {
+    throw new Error("Cet utilisateur ne possède pas de mot de passe enregistré.");
+  }
+
+  const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+  if (!isPasswordValid) {
+    throw new Error("Mot de passe actuel incorrect");
+  }
+
+  const newHashedPassword = await bcrypt.hash(newPassword, 10);
+  await updateUserPassword(email, newHashedPassword);
+
+  return "Mot de passe mis à jour avec succès";
 }
