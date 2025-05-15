@@ -1,34 +1,43 @@
+# Projet dev-drive
 
-# Projet dev-auth
-
-## Installation 
+## Installation
 
 ### Frontend
 
-- Deplacez vous dans le dossier frontend 
+- Deplacez vous dans le dossier frontend
+
 ```powershell, ps1
 cd ./frontend
 ```
+
 - executez la commande suivante dans le terminal
+
 ```powershell, ps1
 npm install
 ```
+
 - lancez le projet en executant
+
 ```powershell, ps1
 npm start
 ```
 
 ### Backend
 
-- Deplacez vous dans le dossier backend 
+- Deplacez vous dans le dossier backend
+
 ```powershell, ps1
 cd ./backend
 ```
+
 - executez la commande suivante dans le terminal
+
 ```powershell, ps1
 npm install
 ```
+
 - lancez le projet en executant
+
 ```powershell, ps1
 npm run dev
 ```

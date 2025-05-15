@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { io } from "socket.io-client";
 import Button from "../components/ui/Button";
 import { AuthContext } from "../store/AuthContext";
@@ -15,6 +15,9 @@ export default function DocumentEditor() {
   const [title, setTitle] = useState("");
   const [quill, setQuill] = useState();
   const { currentUser } = useContext(AuthContext);
+  const [searchParams] = useSearchParams();
+
+  const folderId = searchParams.get("folderId");
 
   useEffect(() => {
     const s = io("http://localhost:8000");
@@ -26,13 +29,12 @@ export default function DocumentEditor() {
     if (socket == null || quill == null) return;
 
     socket.once("load-document", (document, title) => {
-      console.log("Document loaded:", document, title);
       quill.setContents(document);
       setTitle(title);
       quill.enable();
     });
 
-    socket.emit("get-document", documentId, currentUser.id);
+    socket.emit("get-document", documentId, currentUser.id, folderId);
   }, [socket, quill, documentId]);
 
   useEffect(() => {
@@ -89,7 +91,6 @@ export default function DocumentEditor() {
     e.preventDefault();
     // Logique d'envoi d'email ou de partage
     const email = e.target.email.value;
-    console.log("Partage avec :", email);
 
     axios
       .post(`http://localhost:8000/document/${documentId}/share`, {

@@ -5,8 +5,8 @@ import {
 
 function setupSocket(io) {
   io.on("connection", (socket) => {
-    socket.on("get-document", async (documentId, userId) => {
-      const document = await getOrCreateDocument(documentId, userId);
+    socket.on("get-document", async (documentId, userId, folderId) => {
+      const document = await getOrCreateDocument(documentId, userId, folderId);
       socket.join(documentId);
       socket.join(userId);
 

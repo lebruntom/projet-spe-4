@@ -1,6 +1,6 @@
 import { db } from "../../index.js";
 
-export function getOrCreateDocument(id, userId) {
+export function getOrCreateDocument(id, userId, folderId) {
   return new Promise((resolve, reject) => {
     db.get("SELECT * FROM documents WHERE id = ?", [id], (err, row) => {
       if (err) return reject(err);
@@ -12,8 +12,8 @@ export function getOrCreateDocument(id, userId) {
         });
       } else {
         db.run(
-          "INSERT INTO documents (id, data, user_id_last_update) VALUES (?, ?, ?)",
-          [id, JSON.stringify({}), userId],
+          "INSERT INTO documents (id, data, user_id_last_update, folder_id) VALUES (?, ?, ?, ?)",
+          [id, JSON.stringify({}), userId, folderId],
           (err) => {
             if (err) return reject(err);
             return resolve({ id, data: {}, title: "" });
@@ -26,8 +26,6 @@ export function getOrCreateDocument(id, userId) {
 }
 
 export function updateDocument(id, data, title, userId) {
-  console.log("updateDocument", id, data, title, userId);
-
   return new Promise((resolve, reject) => {
     db.run(
       "UPDATE documents SET data = ?, title= ?, user_id_last_update = ? WHERE id = ?",
@@ -69,18 +67,28 @@ export function getUsersForDocument(documentId) {
   });
 }
 
-export function getDocumentsForUser(userId) {
+export function getDocumentsForUser(userId, folderId) {
   return new Promise((resolve, reject) => {
     db.all(
       `SELECT documents.*, users.email FROM documents
       INNER JOIN users on users.id = documents.user_id_last_update
        INNER JOIN user_documents ON documents.id = user_documents.document_id
-       WHERE user_documents.user_id = ?`,
-      [userId],
+       WHERE user_documents.user_id = ? 
+       AND documents.folder_id = ?`,
+      [userId, folderId],
       (err, rows) => {
         if (err) return reject(err);
         resolve(rows);
       }
     );
+  });
+}
+
+export function deleteDocument(id) {
+  return new Promise((resolve, reject) => {
+    db.run("DELETE FROM documents WHERE id = ?", [id], (err) => {
+      if (err) return reject(err);
+      resolve();
+    });
   });
 }

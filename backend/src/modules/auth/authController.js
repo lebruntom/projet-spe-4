@@ -87,7 +87,7 @@ export async function loginUserController(req, res) {
 //Controller generation qrcode double auth
 export async function createDoubleAuthentification(req, res) {
   const { email } = req.body;
-  const nameService = "Projet Dev-Auth";
+  const nameService = "Projet Dev-Drive";
   const authenticatorSecret = await getSecretDoubleAuth(email);
 
   const otPauth = authenticator.keyuri(email, nameService, authenticatorSecret);
