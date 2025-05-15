@@ -7,6 +7,7 @@ import Button from "../components/ui/Button";
 import { AuthContext } from "../store/AuthContext";
 import axios from "axios";
 import { showToastMessage } from "../utils/common";
+import Peer from 'simple-peer/simplepeer.min.js';
 const SAVE_INTERVAL_MS = 2000;
 export default function DocumentEditor() {
   const { id: documentId } = useParams();
@@ -19,11 +20,19 @@ export default function DocumentEditor() {
 
   const folderId = searchParams.get("folderId");
 
-  useEffect(() => {
-    const s = io("http://localhost:8000");
-    setSocket(s);
-    return () => s.disconnect();
-  }, []);
+    // WebRTC state
+    const myVideo = useRef();
+    const partnerVideo = useRef();
+    const [peer, setPeer] = useState(null);
+
+    useEffect(() => {
+        const s = io("http://localhost:8000");
+        setSocket(s);
+
+        s.emit("join-document", documentId);
+
+        return () => s.disconnect();
+    }, [documentId]);
 
   useEffect(() => {
     if (socket == null || quill == null) return;
@@ -113,7 +122,111 @@ export default function DocumentEditor() {
     socket.emit("send-changes", null, title); // Pas de delta (null), mais mise à jour du titre
   }, [title]); // À chaque changement de titre
 
-  return (
+
+    // WebRTC logic
+    const safeSignal = (signal) => {
+        if (peer && !peer.destroyed) {
+            peer.signal(signal);
+        } else {
+            console.warn("Tentative de signal alors que le peer est null ou détruit.");
+        }
+    };
+    const startCall = () => {
+        if (!socket) {
+            console.error("Socket non initialisé.");
+            return;
+        }
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then((stream) => {
+                if (myVideo.current) {
+                    myVideo.current.srcObject = stream;
+                    myVideo.current.play();
+                }
+
+                const newPeer = new Peer({
+                    initiator: true,
+                    trickle: false,
+                    stream: stream,
+                });
+
+                newPeer.on("signal", (data) => {
+                    socket.emit("webrtc-signal", { documentId, signal: data });
+                });
+
+                newPeer.on("stream", (partnerStream) => {
+                    if (partnerVideo.current) {
+                        partnerVideo.current.srcObject = partnerStream;
+                        partnerVideo.current.play();
+                    }
+                });
+
+                newPeer.on("error", (err) => console.error("Peer error:", err));
+                newPeer.on("close", () => console.log("Peer fermé"));
+
+                setPeer(newPeer);
+
+                socket.on("webrtc-signal", ({ signal }) => {
+                    safeSignal(signal);
+                });
+            })
+            .catch((err) => {
+                console.error("Erreur accès caméra/micro :", err);
+            });
+    };
+    const joinCall = () => {
+        if (!socket) {
+            console.error("Socket non initialisé.");
+            return;
+        }
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then((stream) => {
+                if (myVideo.current) {
+                    myVideo.current.srcObject = stream;
+                    myVideo.current.play();
+                }
+
+                const newPeer = new Peer({
+                    initiator: true,
+                    trickle: false,
+                    stream: stream,
+                });
+
+                newPeer.on("signal", (data) => {
+                    socket.emit("webrtc-signal", { documentId, signal: data });
+                });
+
+                newPeer.on("stream", (partnerStream) => {
+                    if (partnerVideo.current) {
+                        partnerVideo.current.srcObject = partnerStream;
+                        partnerVideo.current.play();
+                    }
+                });
+
+                newPeer.on("error", (err) => console.error("Peer error:", err));
+                newPeer.on("close", () => console.log("Peer fermé"));
+
+                setPeer(newPeer);
+
+                socket.on("webrtc-signal", ({ signal }) => {
+                    safeSignal(signal);
+                });
+            })
+            .catch((err) => {
+                console.error("Erreur accès caméra/micro :", err);
+            });
+    };
+    useEffect(() => {
+        if (!socket) return;
+        const handler = ({ from, signal }) => {
+            console.log("Signal reçu de", from);
+            safeSignal(signal);
+        };
+        socket.on("webrtc-signal", handler);
+
+        return () => socket.off("webrtc-signal", handler);
+    }, [socket, peer]);
+
+    return (
     <>
       <Button onClick={() => setShowModal(true)}>Partager</Button>
 
@@ -157,6 +270,13 @@ export default function DocumentEditor() {
       />
 
       <div className="container" ref={wrapperRef}></div>
+        <div>
+            { myVideo.current?.srcObject ? <Button onClick={joinCall}>Rejoindre l'appel</Button> : <Button onClick={startCall}>Démarrer un appel</Button> }
+            <div>
+                <video ref={myVideo} muted autoPlay playsInline style={{ width: "300px" }} />
+                <video ref={partnerVideo} autoPlay playsInline style={{ width: "300px" }} />
+            </div>
+        </div>
     </>
   );
 }

@@ -17,7 +17,7 @@ const Navbar = () => {
             to={"/"}
             className="self-center text-2xl font-semibold whitespace-nowrap"
           >
-            Dev Auth
+            Project Spe 4
           </Link>
         </div>
         <button
