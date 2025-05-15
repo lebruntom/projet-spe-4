@@ -1,4 +1,5 @@
 import {
+  changeUserPassword,
   checkUserExists,
   getSecretDoubleAuth,
   loginUser,
@@ -279,5 +280,33 @@ export async function qrCodeStatusController(req, res) {
     }
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+export async function changePasswordController(req, res) {
+  try {
+    // On récupère le token dans les cookies
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Token manquant" });
+    }
+    
+
+    const decoded = jwt.verify(token, secretKey);
+    const email = decoded.email;
+
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Champs requis manquants" });
+    }
+
+    const message = await changeUserPassword(
+      email,
+      currentPassword,
+      newPassword
+    );
+    res.status(200).json({ message });
+  } catch (error) {
+    res.status(400).json({ message: error.message || "Erreur inconnue" });
   }
 }
