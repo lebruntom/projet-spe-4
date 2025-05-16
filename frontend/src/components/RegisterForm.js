@@ -1,17 +1,13 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Field, Form, FormikProvider, useFormik } from "formik";
 import * as Yup from "yup";
 import Input from "./ui/Input";
 import Button from "./ui/Button";
 import { register } from "../axios/auth";
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../store/AuthContext";
 import { showToastMessage } from "../utils/common";
 
 //Formulaire d'inscription
 const RegisterForm = () => {
-  const navigate = useNavigate();
-  const { setCurrentUser } = useContext(AuthContext);
 
   //Regles sur les champs du formaulaire
   const validationSchema = Yup.object().shape({
@@ -38,9 +34,7 @@ const RegisterForm = () => {
           .then((res) => {
             //Si la reponse est 201 on rempli le contexte et on redirige
             if (res.status === 201) {
-              setCurrentUser({ email: res.data.email, id: res.data.id });
-              navigate("/");
-              showToastMessage("Inscription réussie", "success");
+              showToastMessage("utilisateur créer avec succès", "success");
             }
           })
           .catch((err) => {
@@ -55,6 +49,7 @@ const RegisterForm = () => {
 
   return (
     <FormikProvider value={formik}>
+      <h1>Créer un utilisateur</h1>
       <Form>
         <Field
           type="email"
@@ -87,7 +82,7 @@ const RegisterForm = () => {
           }}
         />
         <div className="flex justify-end mt-4">
-          <Button type="submit">S'inscrire</Button>
+          <Button type="submit">Créer l'utilisateur</Button>
         </div>
       </Form>
     </FormikProvider>

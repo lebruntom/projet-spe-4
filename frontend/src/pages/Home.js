@@ -19,7 +19,7 @@ const Home = () => {
 
   return (
     <div>
-      <div className="text-center text-xl font-bold text-blue">Acccueil</div>
+      <div className="text-center text-xl font-bold text-blue">Accueil</div>
 
       {/* S'il a passé la double vérification (auhorize === true) on affiche son espace personnel */}
       {/* Sinon on affiche la double authentification */}

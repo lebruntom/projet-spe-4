@@ -16,3 +16,51 @@ export function updateUserPassword(email, newHashedPassword) {
     );
   });
 }
+
+export function blockUser(email) {
+  return new Promise((resolve, reject) => {
+    db.run(
+      "UPDATE users SET blocked = ? WHERE email = ?",
+      [true, email],
+      function (err) {
+        if (err) {
+          console.error(err.message);
+          reject(new Error("Erreur lors du blocage de l'utilisateur"));
+        } else {
+          resolve("Utilisateur bloqué avec succès");
+        }
+      }
+    );
+  });
+}
+
+export function unblockUser(email) {
+  return new Promise((resolve, reject) => {
+    db.run(
+      "UPDATE users SET blocked = ? WHERE email = ?",
+      [false, email],
+      function (err) {
+        if (err) {
+          console.error(err.message);
+          reject(new Error("Erreur lors du déblocage de l'utilisateur"));
+        } else {
+          resolve("Utilisateur débloqué avec succès");
+        }
+      }
+    );
+  });
+}
+
+export function getUsers () {
+  return new Promise((resolve, reject) => {
+    db.all("SELECT * FROM users WHERE role = user", (err, rows) => {
+      if (err) {
+        console.error(err.message);
+        reject(new Error("Erreur lors de la récupération des utilisateurs"));
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+}
+

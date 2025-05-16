@@ -1,18 +1,18 @@
-import RegisterForm from "../components/RegisterForm";
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import RegisterForm from "../components/RegisterForm";
+import UserAdminPanel from "../components/AdminPanel"; // nouveau composant
 
 const Admin = () => {
-
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="bg-white max-w-[500px] p-6 rounded-lg min-w-[300px] w-1/2 shadow-md">
-        <div className="text-center text-lg font-bold text-blue">
+      <div className="bg-white max-w-[800px] p-6 rounded-lg min-w-[300px] w-3/4 shadow-md">
+        <div className="text-center text-lg font-bold text-blue-700 mb-4">
           Administration
         </div>
-        <div className="mt-4">
+        <div className="mb-6">
           <RegisterForm />
         </div>
+        <UserAdminPanel />
       </div>
     </div>
   );

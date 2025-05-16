@@ -14,6 +14,7 @@ import { Server } from "socket.io";
 import setupSocket from "./socket.js";
 import http from "http";
 import uploadRoute from "./modules/upload/uploadRoute.js";
+import userRoute from "./modules/user/userRoute.js";
 
 const app = express();
 app.use(bodyParser.json());
@@ -33,7 +34,7 @@ export const db = new sqlite3.Database("user.db");
 //Création de la table user si elle n'existe pas
 db.serialize(() => {
   db.run(
-    " CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT, secret TEXT, password TEXT, role TEXT DEFAULT 'user', qrCode INTEGER DEFAULT 0)"
+    " CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT, secret TEXT, password TEXT, role TEXT DEFAULT 'user', blocked BOOLEAN DEFAULT false, qrCode INTEGER DEFAULT 0)"
   );
   db.run(
     ` INSERT INTO users (email, secret, password, role) VALUES ('admin@admin.com', 'JFZFQGTYBYUVUWBS', '$2b$10$C9F7myjhy1lzwJna4CM5h.PQktuw86bCA.oSWbsZYWRSgU8347ipq', 'admin')`
@@ -154,6 +155,7 @@ app.use(authRoute);
 app.use(documentRoutes);
 app.use(folderRoutes);
 app.use(uploadRoute);
+app.use(userRoute);
 app.use("/uploads", express.static("uploads"));
 
 const server = http.createServer(app);
