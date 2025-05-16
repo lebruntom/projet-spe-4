@@ -17,6 +17,8 @@ export default function DocumentEditor() {
   const [quill, setQuill] = useState();
   const { currentUser } = useContext(AuthContext);
   const [searchParams] = useSearchParams();
+    const [inCall, setInCall] = useState(false);
+    const [callActive, setCallActive] = useState(false);
 
   const folderId = searchParams.get("folderId");
 
@@ -31,8 +33,32 @@ export default function DocumentEditor() {
 
         s.emit("join-document", documentId);
 
+        // 💡 Ce setTimeout force le check après que le join soit pris en compte
+        setTimeout(() => {
+            s.emit("check-call", documentId, (isCallActive) => {
+                setCallActive(isCallActive);
+            });
+        }, 200); // 200ms suffit souvent (sinon essaye 500ms)
+
         return () => s.disconnect();
     }, [documentId]);
+    useEffect(() => {
+        if (!socket || !documentId) return;
+
+        // Vérifie si un appel est déjà actif à la connexion
+        socket.emit("check-call", documentId, (isCallActive) => {
+            setCallActive(isCallActive);
+        });
+
+        // Écoute les changements en temps réel
+        socket.on("call-started", () => setCallActive(true));
+        socket.on("call-ended", () => setCallActive(false));
+
+        return () => {
+            socket.off("call-started");
+            socket.off("call-ended");
+        };
+    }, [socket, documentId]);
 
   useEffect(() => {
     if (socket == null || quill == null) return;
@@ -168,6 +194,8 @@ export default function DocumentEditor() {
                 socket.on("webrtc-signal", ({ signal }) => {
                     safeSignal(signal);
                 });
+                socket.emit("start-call", documentId);
+                setInCall(true);
             })
             .catch((err) => {
                 console.error("Erreur accès caméra/micro :", err);
@@ -210,6 +238,7 @@ export default function DocumentEditor() {
                 socket.on("webrtc-signal", ({ signal }) => {
                     safeSignal(signal);
                 });
+                setInCall(true);
             })
             .catch((err) => {
                 console.error("Erreur accès caméra/micro :", err);
@@ -225,6 +254,29 @@ export default function DocumentEditor() {
 
         return () => socket.off("webrtc-signal", handler);
     }, [socket, peer]);
+    const handleLeaveCall = () => {
+        if (peer) {
+            peer.destroy();
+            setPeer(null);
+        }
+
+        if (myVideo.current?.srcObject) {
+            myVideo.current.srcObject.getTracks().forEach(track => track.stop());
+            myVideo.current.srcObject = null;
+        }
+
+        if (partnerVideo.current?.srcObject) {
+            partnerVideo.current.srcObject.getTracks().forEach(track => track.stop());
+            partnerVideo.current.srcObject = null;
+        }
+
+        // Émettre l'événement pour prévenir les autres que l'appel est terminé
+        if (socket && documentId) {
+            socket.emit("end-call", documentId);
+        }
+
+        setInCall(false);
+    };
 
     return (
     <>
@@ -271,7 +323,16 @@ export default function DocumentEditor() {
 
       <div className="container" ref={wrapperRef}></div>
         <div>
-            { myVideo.current?.srcObject ? <Button onClick={joinCall}>Rejoindre l'appel</Button> : <Button onClick={startCall}>Démarrer un appel</Button> }
+            {!inCall ? (
+                <>
+                    <Button onClick={startCall}>Démarrer un appel</Button>
+                    {callActive && <Button onClick={joinCall}>Rejoindre l'appel</Button>}
+                </>
+            ) : (
+                <Button onClick={handleLeaveCall} className="bg-red-500 text-white">
+                    Quitter l'appel
+                </Button>
+            )}
             <div>
                 <video ref={myVideo} muted autoPlay playsInline style={{ width: "300px" }} />
                 <video ref={partnerVideo} autoPlay playsInline style={{ width: "300px" }} />
