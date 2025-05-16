@@ -116,18 +116,15 @@ export default function Documents() {
     <div className="max-w-6xl mx-auto p-6 bg-white rounded-xl shadow-md mt-10">
       <div className="flex flex-wrap justify-between items-center gap-6 mb-8 max-w-5xl mx-auto">
         <div className="flex flex-wrap gap-6">
-          {/* Boutons Créer un fichier et Créer un dossier */}
           <Button
             className="bg-black hover:bg-gray-800 text-white font-semibold rounded-lg px-6 py-6 shadow flex flex-col items-center min-w-[160px] transition-transform hover:scale-105"
             onClick={() =>
               navigate(`/docs/${uuidV4()}?folderId=${folderId ?? "null"}`)
             }
           >
-            {/* Le + centré tout en haut */}
             <span className="text-4xl font-extrabold mb-3 leading-none select-none">
               +
             </span>
-            {/* Icône + texte alignés horizontalement */}
             <div className="flex items-center gap-3 text-lg">
               <FaFile className="text-xl" />
               <span>Créer un fichier</span>
@@ -148,7 +145,6 @@ export default function Documents() {
           </Button>
         </div>
 
-        {/* FileUpload à droite, taille max définie */}
         <div className="flex-grow min-w-[280px] max-w-[400px]">
           <FileUpload loadFiles={loadFiles} />
         </div>

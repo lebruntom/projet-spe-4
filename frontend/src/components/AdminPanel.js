@@ -2,19 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaLock, FaUnlock } from "react-icons/fa";
 
-const UserAdminPanel = () => {
-  const [users, setUsers] = useState([]);
+const AdminPanel = ({users,fetchUsers}) => {
 
-  const fetchUsers = async () => {
-    try {
-      const res = await axios.get("http://localhost:8000/admin/users", {
-        withCredentials: true,
-      });
-      setUsers(res.data);
-    } catch (err) {
-      console.error("Erreur de chargement des utilisateurs", err);
-    }
-  };
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const handleBlockToggle = async (user) => {
     const url = `http://localhost:8000/admin/users/${user.id}/${user.blocked ? "unblock" : "block"}`;
@@ -26,9 +18,6 @@ const UserAdminPanel = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
 
   return (
     <div className="p-6 bg-white rounded-xl shadow max-w-4xl mx-auto mt-10">
@@ -86,4 +75,4 @@ const UserAdminPanel = () => {
   );
 };
 
-export default UserAdminPanel;
+export default AdminPanel;

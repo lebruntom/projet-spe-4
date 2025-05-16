@@ -3,7 +3,7 @@ import {
     updateDocument,
 } from "./modules/document/documentService.js";
 
-const documentUsers = {}; // { documentId: [socket.id, ...] }
+const documentUsers = {}; 
 const activeCalls = {};
 
 function setupSocket(io) {
@@ -15,7 +15,6 @@ function setupSocket(io) {
             if (!documentUsers[documentId]) documentUsers[documentId] = [];
             documentUsers[documentId].push(socket.id);
 
-            // Option : notifier les autres qu'un nouveau user est là
             socket.to(documentId).emit("user-joined", {socketId: socket.id});
 
             socket.on("disconnect", () => {
@@ -45,13 +44,13 @@ function setupSocket(io) {
         // Quand quelqu’un démarre un appel
         socket.on("start-call", (documentId) => {
             activeCalls[documentId] = true;
-            socket.to(documentId).emit("call-started"); // notifier les autres
+            socket.to(documentId).emit("call-started"); 
         });
 
 // Quand quelqu’un quitte un appel
         socket.on("end-call", (documentId) => {
             activeCalls[documentId] = false;
-            socket.to(documentId).emit("call-ended"); // notifier les autres
+            socket.to(documentId).emit("call-ended"); 
         });
 
 // Permet au client de vérifier s'il y a un appel actif

@@ -3,7 +3,7 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { db } from "../../index.js"; // <-- Assure-toi que le chemin est correct
+import { db } from "../../index.js"; 
 import { randomUUID as uuidv4 } from "crypto";
 
 const router = express.Router();
@@ -32,8 +32,8 @@ router.post("/upload", upload.single("file"), (req, res) => {
     return res.status(400).json({ message: "No file uploaded" });
   }
 
-  const userId = req.body.userId; // Doit être envoyé par le client
-  const folderId = req.body.folderId; // Doit être envoyé par le client
+  const userId = req.body.userId; 
+  const folderId = req.body.folderId; 
   const fileId = uuidv4();
   const filePath = `/uploads/${req.file.filename}`;
 
@@ -41,7 +41,6 @@ router.post("/upload", upload.single("file"), (req, res) => {
     return res.status(400).json({ message: "Missing userId" });
   }
 
-  // Insertion dans la table file
   db.run(
     `INSERT INTO file (id, user_id, path, folder_id) VALUES (?, ?, ?, ?)`,
     [fileId, userId, filePath, folderId],

@@ -33,12 +33,11 @@ export default function DocumentEditor() {
 
         s.emit("join-document", documentId);
 
-        // 💡 Ce setTimeout force le check après que le join soit pris en compte
         setTimeout(() => {
             s.emit("check-call", documentId, (isCallActive) => {
                 setCallActive(isCallActive);
             });
-        }, 200); // 200ms suffit souvent (sinon essaye 500ms)
+        }, 200);
 
         return () => s.disconnect();
     }, [documentId]);
@@ -145,8 +144,8 @@ export default function DocumentEditor() {
   useEffect(() => {
     if (socket == null || quill == null) return;
 
-    socket.emit("send-changes", null, title); // Pas de delta (null), mais mise à jour du titre
-  }, [title]); // À chaque changement de titre
+    socket.emit("send-changes", null, title); 
+  }, [title]);
 
 
     // WebRTC logic
@@ -279,65 +278,99 @@ export default function DocumentEditor() {
     };
 
     return (
-    <>
-      <Button onClick={() => setShowModal(true)}>Partager</Button>
-
-      {showModal && (
-        <form
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          onSubmit={handleShare}
-        >
-          <div className="bg-white p-6 rounded shadow-lg w-96">
-            <h2 className="text-xl font-semibold mb-4">Partager le document</h2>
-            <input
-              type="email"
-              placeholder="Adresse e-mail"
-              name="email"
-              className="w-full border border-gray-300 p-2 rounded mb-4"
-              required
-            />
-            <div className="flex justify-end space-x-2">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 bg-gray-300 rounded"
-              >
-                Annuler
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-500 text-black rounded"
-              >
-                Partager
-              </button>
-            </div>
-          </div>
-        </form>
-      )}
-      <input
-        type="text"
-        placeholder="Titre du document"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="border border-gray-300 p-2 rounded mb-4"
-      />
-
-      <div className="container" ref={wrapperRef}></div>
-        <div>
-            {!inCall ? (
-                <>
-                    <Button onClick={startCall}>Démarrer un appel</Button>
-                    {callActive && <Button onClick={joinCall}>Rejoindre l'appel</Button>}
-                </>
-            ) : (
-                <Button onClick={handleLeaveCall} className="bg-red-500 text-white">
-                    Quitter l'appel
-                </Button>
-            )}
-            <div>
-                <video ref={myVideo} muted autoPlay playsInline style={{ width: "300px" }} />
-                <video ref={partnerVideo} autoPlay playsInline style={{ width: "300px" }} />
-            </div>
+      <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+        {/* Bouton de partage */}
+        <div className="flex justify-between items-center">
+          <input
+            type="text"
+            placeholder="Titre du document"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="text-xl font-semibold w-full border border-gray-300 px-4 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <Button
+            onClick={() => setShowModal(true)}
+            className="ml-4 px-6 py-2 bg-black text-white rounded-xl shadow hover:bg-blue-700 transition"
+          >
+            Partager
+          </Button>
         </div>
-    </>
-  );
+    
+        {/* Modale de partage */}
+        {showModal && (
+          <form
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
+            onSubmit={handleShare}
+          >
+            <div className="bg-white p-6 rounded-2xl shadow-xl w-96 space-y-4">
+              <h2 className="text-2xl font-bold text-gray-800">Partager le document</h2>
+              <input
+                type="email"
+                placeholder="Adresse e-mail"
+                name="email"
+                className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                required
+              />
+              <div className="flex justify-end space-x-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-black hover:bg-gray-300 text-white rounded-lg"
+                >
+                  Partager
+                </button>
+              </div>
+            </div>
+          </form>
+        )}
+    
+        {/* Éditeur */}
+        <div className="bg-white rounded-xl shadow-lg p-4" ref={wrapperRef}></div>
+    
+        {/* Appel vidéo */}
+        <div className="mt-8">
+          {!inCall ? (
+            <div className="flex gap-4">
+              <Button onClick={startCall} className="bg-green-600 text-white px-6 py-2 rounded-lg shadow hover:bg-green-700">
+                Démarrer un appel
+              </Button>
+              {callActive && (
+                <Button onClick={joinCall} className="bg-yellow-500 text-white px-6 py-2 rounded-lg shadow hover:bg-yellow-600">
+                  Rejoindre l'appel
+                </Button>
+              )}
+            </div>
+          ) : (
+            <Button
+              onClick={handleLeaveCall}
+              className="bg-red-600 text-white px-6 py-2 rounded-lg shadow hover:bg-red-700"
+            >
+              Quitter l'appel
+            </Button>
+          )}
+    
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <video
+              ref={myVideo}
+              muted
+              autoPlay
+              playsInline
+              className="w-full rounded-lg border shadow"
+            />
+            <video
+              ref={partnerVideo}
+              autoPlay
+              playsInline
+              className="w-full rounded-lg border shadow"
+            />
+          </div>
+        </div>
+      </div>
+    );
 }

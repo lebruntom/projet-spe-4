@@ -56,6 +56,9 @@ React
 - axios
 - react-router-dom
 - yup
+- quill
+- webrtc
+-simple-peer
 
 ### backend
 
@@ -65,3 +68,13 @@ Node JS
 - cors
 - express
 - sqlite3
+- scoket.io
+- multer
+
+
+## Collaborateurs
+
+- Lilian Vasconcelos
+- Enzo Herichard
+- Tom Lebrun
+- Arthur Ferreira

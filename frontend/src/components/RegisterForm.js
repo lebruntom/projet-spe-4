@@ -6,7 +6,7 @@ import Button from "./ui/Button";
 import { register } from "../axios/auth";
 import { showToastMessage } from "../utils/common";
 
-const RegisterForm = () => {
+const RegisterForm = ({ fetchUsers }) => {
   const validationSchema = Yup.object().shape({
     email: Yup.string().email("Email invalide").required("Email requis"),
     password: Yup.string()
@@ -29,6 +29,7 @@ const RegisterForm = () => {
             if (res.status === 201) {
               showToastMessage("Utilisateur créé avec succès", "success");
               formik.resetForm();
+              fetchUsers();
             }
           })
           .catch(() => {

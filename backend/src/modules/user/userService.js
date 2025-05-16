@@ -1,4 +1,3 @@
-// Met à jour le mot de passe d'un utilisateur
 import { db } from "../../index.js";
 export function updateUserPassword(email, newHashedPassword) {
   return new Promise((resolve, reject) => {

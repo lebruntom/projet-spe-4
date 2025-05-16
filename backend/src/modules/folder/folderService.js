@@ -1,6 +1,4 @@
 import { db } from "../../index.js"
-
-// Créer un dossier
 export function createFolder(name, parentId, userId) {
   return new Promise((resolve, reject) => {
     db.run(
@@ -14,7 +12,6 @@ export function createFolder(name, parentId, userId) {
   });
 }
 
-// Récupérer les dossiers enfants
 export function getFoldersByParent(parentId, userId){
   return new Promise((resolve, reject)=>{
     db.all("SELECT * FROM folders WHERE parent_id IS ? AND user_id = ?", [parentId, userId], (err, rows)=>{
@@ -24,7 +21,6 @@ export function getFoldersByParent(parentId, userId){
   })
 }
 
-// Récupérer les documents d’un dossier 
 export function getDocumentsInFolder(folderId, userId){
   return new Promise((resolve, reject)=>{
     db.all(`SELECT documents.*, users.email FROM documents
@@ -37,7 +33,6 @@ export function getDocumentsInFolder(folderId, userId){
   })
 }
 
-// supprimer un dossier
 export function deleteFolder(folderId, userId){
   return new Promise((resolve, reject)=>{
     db.run("DELETE FROM folders WHERE id = ?", [folderId], (err)=>{

@@ -11,13 +11,12 @@ export async function checkUserExists(email) {
       if (err) {
         reject(err);
       } else {
-        resolve(row || false); // Renvoie la row si trouvée, sinon false
+        resolve(row || false); 
       }
     });
   });
 }
 
-//Insert un user en bdd s'il n'existe pas
 export async function registerUser(email, password) {
   const userExists = await checkUserExists(email);
   if (userExists) {

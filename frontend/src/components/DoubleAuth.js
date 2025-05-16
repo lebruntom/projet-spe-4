@@ -64,42 +64,47 @@ const DoubleAuth = ({ setAuthorize }) => {
   }, [currentUser]);
 
   return (
-    <div className="bg-white max-w-[500px] p-6 rounded-lg min-w-[300px] w-1/2 shadow-md">
-      <div className="text-center text-lg text-bold text-blue">
-        Verifions votre identitée
-      </div>
-      <div className="text-xs text-center">
-        Scannez le qrCode et saisissez le code
-      </div>
-      {/* Affichage du qrcode  */}
-      {qrCode !== "" && (
-        <div className="flex justify-center">
-          <img src={qrCode} alt="qr code" width={200} />
+    <div
+      style={{ minHeight: "calc(100vh - 150px)" }}
+      className="flex items-center justify-center "
+    >
+      <div className="bg-white max-w-[500px] p-6 rounded-lg min-w-[300px] w-1/2 shadow-md">
+        <div className="text-center text-lg text-bold text-blue">
+          Verifions votre identitée
         </div>
-      )}
-      {/* Formulaire pour verifier le code saisie par le user  */}
-      <FormikProvider value={formik}>
-        <Form>
-          <Field
-            type="text"
-            id="code"
-            as={Input}
-            name="code"
-            onChange={formik.handleChange}
-            value={formik.values.email}
-            placeholder=""
-            label="Code"
-            error={{
-              name: formik.errors.email,
-              touched: formik.touched.email,
-            }}
-          />
-
-          <div className="flex justify-end mt-4">
-            <Button type="submit">Verifier</Button>
+        <div className="text-xs text-center">
+          Scannez le qrCode et saisissez le code
+        </div>
+        {/* Affichage du qrcode  */}
+        {qrCode !== "" && (
+          <div className="flex justify-center">
+            <img src={qrCode} alt="qr code" width={200} />
           </div>
-        </Form>
-      </FormikProvider>
+        )}
+        {/* Formulaire pour verifier le code saisie par le user  */}
+        <FormikProvider value={formik}>
+          <Form>
+            <Field
+              type="text"
+              id="code"
+              as={Input}
+              name="code"
+              onChange={formik.handleChange}
+              value={formik.values.email}
+              placeholder=""
+              label="Code"
+              error={{
+                name: formik.errors.email,
+                touched: formik.touched.email,
+              }}
+            />
+
+            <div className="flex justify-end mt-4">
+              <Button type="submit">Verifier</Button>
+            </div>
+          </Form>
+        </FormikProvider>
+      </div>
     </div>
   );
 };
