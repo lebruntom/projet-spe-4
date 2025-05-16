@@ -16,6 +16,7 @@ export default function Documents() {
   const location = useLocation();
   const [documents, setDocuments] = useState([]);
   const [folders, setFolders] = useState([]);
+  const [breadcrumb, setBreadcrumb] = useState([]);
   const { currentUser } = useContext(AuthContext);
   const [showModal, setShowModal] = useState(false);
   const [files, setFiles] = useState([]);
@@ -64,7 +65,16 @@ export default function Documents() {
       )
       .then((res) => setDocuments(res.data))
       .catch((err) => console.error("Erreur récupération documents", err));
-
+    if (folderId) {
+      axios
+        .get(`http://localhost:8000/folders/breadcrumb/${folderId}`, {
+          withCredentials: true,
+        })
+        .then((res) => setBreadcrumb(res.data))
+        .catch((err) =>
+          console.error("Erreur récupération du breadcrumb", err)
+        );
+    }
     loadFiles();
     loadFolders();
   }, [currentUser, location.pathname]);
@@ -104,42 +114,45 @@ export default function Documents() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white rounded-xl shadow-md mt-10">
-     <div className="flex flex-wrap justify-between items-center gap-6 mb-8 max-w-5xl mx-auto">
-  <div className="flex flex-wrap gap-6">
-    {/* Boutons Créer un fichier et Créer un dossier */}
-    <Button
-      className="bg-black hover:bg-gray-800 text-white font-semibold rounded-lg px-6 py-6 shadow flex flex-col items-center min-w-[160px] transition-transform hover:scale-105"
-      onClick={() =>
-        navigate(`/docs/${uuidV4()}?folderId=${folderId ?? "null"}`)
-      }
-    >
-      {/* Le + centré tout en haut */}
-      <span className="text-4xl font-extrabold mb-3 leading-none select-none">+</span>
-      {/* Icône + texte alignés horizontalement */}
-      <div className="flex items-center gap-3 text-lg">
-        <FaFile className="text-xl" />
-        <span>Créer un fichier</span>
+      <div className="flex flex-wrap justify-between items-center gap-6 mb-8 max-w-5xl mx-auto">
+        <div className="flex flex-wrap gap-6">
+          {/* Boutons Créer un fichier et Créer un dossier */}
+          <Button
+            className="bg-black hover:bg-gray-800 text-white font-semibold rounded-lg px-6 py-6 shadow flex flex-col items-center min-w-[160px] transition-transform hover:scale-105"
+            onClick={() =>
+              navigate(`/docs/${uuidV4()}?folderId=${folderId ?? "null"}`)
+            }
+          >
+            {/* Le + centré tout en haut */}
+            <span className="text-4xl font-extrabold mb-3 leading-none select-none">
+              +
+            </span>
+            {/* Icône + texte alignés horizontalement */}
+            <div className="flex items-center gap-3 text-lg">
+              <FaFile className="text-xl" />
+              <span>Créer un fichier</span>
+            </div>
+          </Button>
+
+          <Button
+            className="bg-black hover:bg-gray-800 text-white font-semibold rounded-lg px-6 py-6 shadow flex flex-col items-center min-w-[160px] transition-transform hover:scale-105"
+            onClick={() => setShowModal(true)}
+          >
+            <span className="text-4xl font-extrabold mb-3 leading-none select-none">
+              +
+            </span>
+            <div className="flex items-center gap-3 text-lg">
+              <FaFolder className="text-xl" />
+              <span>Créer un dossier</span>
+            </div>
+          </Button>
+        </div>
+
+        {/* FileUpload à droite, taille max définie */}
+        <div className="flex-grow min-w-[280px] max-w-[400px]">
+          <FileUpload loadFiles={loadFiles} />
+        </div>
       </div>
-    </Button>
-
-    <Button
-      className="bg-black hover:bg-gray-800 text-white font-semibold rounded-lg px-6 py-6 shadow flex flex-col items-center min-w-[160px] transition-transform hover:scale-105"
-      onClick={() => setShowModal(true)}
-    >
-      <span className="text-4xl font-extrabold mb-3 leading-none select-none">+</span>
-      <div className="flex items-center gap-3 text-lg">
-        <FaFolder className="text-xl" />
-        <span>Créer un dossier</span>
-      </div>
-    </Button>
-  </div>
-
-  {/* FileUpload à droite, taille max définie */}
-  <div className="flex-grow min-w-[280px] max-w-[400px]">
-    <FileUpload loadFiles={loadFiles} />
-  </div>
-</div>
-
 
       {showModal && (
         <ModalNewFolder
@@ -147,7 +160,27 @@ export default function Documents() {
           handleCreateFolder={handleCreateFolder}
         />
       )}
-
+      {breadcrumb.length > 0 && (
+        <div className="text-sm text-gray-600 mb-4 flex items-center flex-wrap gap-1">
+          <span
+            onClick={() => navigate("/documents")}
+            className="cursor-pointer text-blue-600 hover:underline"
+          >
+            Accueil
+          </span>
+          {breadcrumb.map((folder, index) => (
+            <span key={folder.id} className="flex items-center gap-1">
+              <span className="mx-1 text-gray-400">/</span>
+              <span
+                onClick={() => navigate(`/documents/${folder.id}`)}
+                className="cursor-pointer text-blue-600 hover:underline"
+              >
+                {folder.name}
+              </span>
+            </span>
+          ))}
+        </div>
+      )}
       <h2 className="text-3xl font-bold mb-6 text-gray-800">Mes documents</h2>
 
       <section className="mb-6">
@@ -164,7 +197,9 @@ export default function Documents() {
       </section>
 
       <section className="mb-6">
-        <h3 className="text-xl font-semibold mb-3 text-gray-700">Fichiers texte</h3>
+        <h3 className="text-xl font-semibold mb-3 text-gray-700">
+          Fichiers texte
+        </h3>
         {documents.length > 0 ? (
           <div className="space-y-3">
             {documents.map((doc) => (
@@ -181,10 +216,7 @@ export default function Documents() {
       </section>
 
       <section>
-        <h3 className="text-xl font-semibold mb-3 text-gray-700">
-          
-          Documents
-        </h3>
+        <h3 className="text-xl font-semibold mb-3 text-gray-700">Documents</h3>
         {files.length > 0 ? (
           <div className="space-y-3">
             {files.map((file) => (
