@@ -47,6 +47,11 @@ export async function loginUserController(req, res) {
     //On verifie les infos
     const result = await loginUser(email, password);
     const id = result.id;
+
+    if(result.blocked){
+      res.status(401).json({ error: "Utilisateur bloqué" });
+      return;
+    }
     //Si ca reusssi on créé le token
     if (result.success) {
       //On supprime l'email de la liste noire

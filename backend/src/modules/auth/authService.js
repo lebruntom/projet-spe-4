@@ -57,7 +57,7 @@ export async function loginUser(email, password) {
       const isPasswordValid = await bcrypt.compare(password, row.password);
 
       if (isPasswordValid) {
-        resolve({ success: true, id: row.id, role: row.role });
+        resolve({ success: true, id: row.id, role: row.role, blocked: row.blocked });
         return;
       } else {
         resolve({ success: false, error: "Invalid email or password" });
