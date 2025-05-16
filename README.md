@@ -22,6 +22,9 @@ npm install
 npm start
 ```
 
+- Se connecter avec les identifiants suivants
+  - Email : admin@admin.com
+  - Mot de passe : Admin123
 ### Backend
 
 - Deplacez vous dans le dossier backend
