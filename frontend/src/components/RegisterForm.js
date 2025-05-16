@@ -6,18 +6,14 @@ import Button from "./ui/Button";
 import { register } from "../axios/auth";
 import { showToastMessage } from "../utils/common";
 
-//Formulaire d'inscription
 const RegisterForm = () => {
-
-  //Regles sur les champs du formaulaire
   const validationSchema = Yup.object().shape({
-    email: Yup.string().email(`Email invalide`).required(`Email requis`),
+    email: Yup.string().email("Email invalide").required("Email requis"),
     password: Yup.string()
-      .min(8, `Min 8 caractères`)
-      .required(`Mot de passe requis`),
+      .min(8, "Min 8 caractères")
+      .required("Mot de passe requis"),
   });
 
-  //Valeurs initiales du formulaire
   const initialValues = {
     email: "",
     password: "",
@@ -26,20 +22,17 @@ const RegisterForm = () => {
   const formik = useFormik({
     initialValues,
     validationSchema,
-    //Soumission du formulaire
     onSubmit: async (values) => {
       try {
-        //Call api pour register le user
         register({ email: values.email, password: values.password })
           .then((res) => {
-            //Si la reponse est 201 on rempli le contexte et on redirige
             if (res.status === 201) {
-              showToastMessage("utilisateur créer avec succès", "success");
+              showToastMessage("Utilisateur créé avec succès", "success");
+              formik.resetForm();
             }
           })
-          .catch((err) => {
-            //Gestion des messages d'erreurs
-            showToastMessage("erreur, veuillez réessayer", "error");
+          .catch(() => {
+            showToastMessage("Erreur, veuillez réessayer", "error");
           });
       } catch (error) {
         alert(error);
@@ -48,44 +41,50 @@ const RegisterForm = () => {
   });
 
   return (
-    <FormikProvider value={formik}>
-      <h1>Créer un utilisateur</h1>
-      <Form>
-        <Field
-          type="email"
-          id="email"
-          as={Input}
-          name="email"
-          icon="IoMdMail"
-          onChange={formik.handleChange}
-          value={formik.values.email}
-          placeholder="johndoe@domain.com"
-          label="Email"
-          error={{
-            name: formik.errors.email,
-            touched: formik.touched.email,
-          }}
-        />
-        <Field
-          type="password"
-          id="password"
-          as={Input}
-          name="password"
-          icon="IoMdLock"
-          onChange={formik.handleChange}
-          value={formik.values.password}
-          placeholder="••••••••••••"
-          label="Mot de passe"
-          error={{
-            name: formik.errors.password,
-            touched: formik.touched.password,
-          }}
-        />
-        <div className="flex justify-end mt-4">
-          <Button type="submit">Créer l'utilisateur</Button>
-        </div>
-      </Form>
-    </FormikProvider>
+    <div className="mx-auto bg-white border rounded-lg p-6 shadow mt-8">
+      <FormikProvider value={formik}>
+        <h2 className="text-2xl font-bold mb-4 text-gray-800">
+          Créer un utilisateur
+        </h2>
+        <Form className="space-y-4">
+          <Field
+            type="email"
+            id="email"
+            as={Input}
+            name="email"
+            icon="IoMdMail"
+            onChange={formik.handleChange}
+            value={formik.values.email}
+            placeholder="johndoe@domain.com"
+            label="Email"
+            error={{
+              name: formik.errors.email,
+              touched: formik.touched.email,
+            }}
+          />
+          <Field
+            type="password"
+            id="password"
+            as={Input}
+            name="password"
+            icon="IoMdLock"
+            onChange={formik.handleChange}
+            value={formik.values.password}
+            placeholder="••••••••"
+            label="Mot de passe"
+            error={{
+              name: formik.errors.password,
+              touched: formik.touched.password,
+            }}
+          />
+          <div className="flex justify-end">
+            <Button type="submit" className="bg-black text-white px-4 py-2 rounded transition">
+              Créer l'utilisateur
+            </Button>
+          </div>
+        </Form>
+      </FormikProvider>
+    </div>
   );
 };
 

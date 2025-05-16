@@ -1,32 +1,26 @@
 import React from "react";
-import { useContext } from "react";
-import { FaFileAlt, FaTrash } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../store/AuthContext";
+import { FaFileAlt } from "react-icons/fa";
 
 const FileRow = ({ infos }) => {
-  const handleNavigate = (e) => {
-    window.open(`http://localhost:8000${infos.path}`);
+  const handleNavigate = () => {
+    window.open(`http://localhost:8000${infos.path}`, "_blank");
   };
-
-  console.log("infos", infos);
 
   return (
     <li
-      className="hover:bg-gray-750 border-b border-gray-700 px-6 py-4 list-none hover:bg-gray-300 cursor-pointer"
       onClick={handleNavigate}
+      className="list-none border border-gray-300 rounded-md bg-gray-200 hover:bg-gray-100 shadow-sm transition p-4 mb-3 cursor-pointer"
     >
-      <div className="grid grid-cols-12 items-center gap-4">
-        <div className="col-span-4 flex items-center">
-          <div
-            className="flex items-center text-gray-800 hover:text-blue-400"
-            target="_blank"
-          >
-            <FaFileAlt className="mr-3" size={20} />
-            {infos.path}
-          </div>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3 text-gray-700 hover:text-green-600 transition">
+          <FaFileAlt size={18} className="text-green-500" />
+          <span className="font-normal truncate max-w-xs">
+            {infos.path.split("/").pop()}
+          </span>
         </div>
-        <div className="col-span-2 text-gray-600">{infos.path.split('.')[1]}</div>
+        <div className="text-xs text-gray-400 capitalize">
+          {infos.path.split(".").pop()}
+        </div>
       </div>
     </li>
   );
