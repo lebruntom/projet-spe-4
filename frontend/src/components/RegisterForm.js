@@ -39,7 +39,7 @@ const RegisterForm = () => {
             //Si la reponse est 201 on rempli le contexte et on redirige
             if (res.status === 201) {
               setCurrentUser({ email: res.data.email, id: res.data.id });
-              navigate("/account");
+              navigate("/");
               showToastMessage("Inscription réussie", "success");
             }
           })

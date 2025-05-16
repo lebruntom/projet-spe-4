@@ -24,7 +24,7 @@ const Home = () => {
       {/* S'il a passé la double vérification (auhorize === true) on affiche son espace personnel */}
       {/* Sinon on affiche la double authentification */}
       {authorize ? (
-        <div>fdsfsd</div>
+        <div></div>
       ) : (
         <div
           style={{ minHeight: "calc(100vh - 150px)" }}

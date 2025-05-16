@@ -3,7 +3,7 @@ import axios from "axios";
 import { AuthContext } from "../store/AuthContext";
 import { useLocation } from "react-router-dom";
 
-function FileUpload() {
+function FileUpload({ loadFiles }) {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
   const [uploadedUrl, setUploadedUrl] = useState("");
@@ -25,16 +25,17 @@ function FileUpload() {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("userId", currentUser.id);
-    formData.append("folderId", location.pathname.split("/")[
-      location.pathname.split("/").length - 1
-    ] !== "documents"
-      ? parseInt(
-          location.pathname.split("/")[
-            location.pathname.split("/").length - 1
-          ]
-        )
-      : "null" );
-
+    formData.append(
+      "folderId",
+      location.pathname.split("/")[location.pathname.split("/").length - 1] !==
+        "documents"
+        ? parseInt(
+            location.pathname.split("/")[
+              location.pathname.split("/").length - 1
+            ]
+          )
+        : "null"
+    );
 
     try {
       const res = await axios.post("http://localhost:8000/upload", formData, {
@@ -45,6 +46,7 @@ function FileUpload() {
       });
       setMessage(res.data.message);
       setUploadedUrl(`http://localhost:8000${res.data.filePath}`);
+      loadFiles();
     } catch (err) {
       console.error(err);
       setMessage("Error uploading file.");
@@ -64,7 +66,12 @@ function FileUpload() {
       {message && <p className="mt-4">{message}</p>}
       {uploadedUrl && (
         <div className="mt-2">
-          <a href={uploadedUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+          <a
+            href={uploadedUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
             View Uploaded File
           </a>
         </div>

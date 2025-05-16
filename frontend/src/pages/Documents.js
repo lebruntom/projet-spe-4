@@ -46,6 +46,32 @@ export default function Documents() {
       });
   };
 
+  const loadFiles = () => {
+    axios
+      .get(
+        `http://localhost:8000/files/${currentUser.id}/folder/${
+          location.pathname.split("/")[
+            location.pathname.split("/").length - 1
+          ] !== "documents"
+            ? parseInt(
+                location.pathname.split("/")[
+                  location.pathname.split("/").length - 1
+                ]
+              )
+            : "null"
+        }`,
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        setFiles(res.data);
+      })
+      .catch((err) => {
+        console.error("Erreur récupération des fichiers", err);
+      });
+  };
+
   useEffect(() => {
     if (!currentUser?.id) return;
 
@@ -73,23 +99,7 @@ export default function Documents() {
         console.error("Erreur récupération documents", err);
       });
 
-      axios.get(`http://localhost:8000/files/${currentUser.id}/folder/${ location.pathname.split("/")[
-        location.pathname.split("/").length - 1
-      ] !== "documents"
-        ? parseInt(
-            location.pathname.split("/")[
-              location.pathname.split("/").length - 1
-            ]
-          )
-        : "null"}`, {
-        withCredentials: true,
-      })
-      .then((res) => {
-        setFiles(res.data);
-      })
-      .catch((err) => {
-        console.error("Erreur récupération des fichiers", err);
-      });
+    loadFiles();
 
     loadFolders();
   }, [currentUser, location.pathname]);
@@ -164,7 +174,7 @@ export default function Documents() {
         >
           Créer un dossier
         </Button>
-        <FileUpload />
+        <FileUpload loadFiles={loadFiles} />
       </div>
       {showModal && (
         <ModalNewFolder
@@ -187,10 +197,7 @@ export default function Documents() {
         />
       ))}
       {files.map((file) => (
-        <FileRow
-          key={file.id}
-          infos={file}
-        />
+        <FileRow key={file.id} infos={file} />
       ))}
     </div>
   );
