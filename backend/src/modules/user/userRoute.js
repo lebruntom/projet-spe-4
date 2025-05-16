@@ -4,7 +4,7 @@ import { db } from "../../index.js";
 const router = express.Router();
 
 router.get("/admin/users", (req, res) => {
-  db.all("SELECT id, email, blocked FROM users", [], (err, rows) => {
+  db.all("SELECT id, email, blocked FROM users where role = 'user'", [], (err, rows) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: "Erreur serveur" });
