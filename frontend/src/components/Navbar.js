@@ -79,6 +79,18 @@ const Navbar = () => {
               </>
             )}
 
+            {currentUser && cookies.doubleAuth && currentUser.role === "admin" && (
+              <li>
+                <Link
+                  to={"/admin"}
+                  className="block py-2 px-3 text-white rounded md:bg-transparent  md:p-0  md:text-gray-900"
+                  aria-current="page"
+                >
+                  Admin
+                </Link>
+              </li>
+            )}
+
             {/* si le user n'est pas connecté on affiche  */}
             {currentUser ? (
               <a href="http://localhost:8000/logout">

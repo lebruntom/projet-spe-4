@@ -26,7 +26,7 @@ const FileRow = ({ infos }) => {
             {infos.path}
           </div>
         </div>
-        <div className="col-span-2 text-gray-600">{"file"}</div>
+        <div className="col-span-2 text-gray-600">{infos.path.split('.')[1]}</div>
       </div>
     </li>
   );

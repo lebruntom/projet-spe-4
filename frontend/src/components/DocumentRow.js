@@ -29,7 +29,7 @@ const DocumentRow = ({ infos, handleDeleteDocument }) => {
             {infos.title}
           </div>
         </div>
-        <div className="col-span-2 text-gray-600">{"file"}</div>
+        <div className="col-span-2 text-gray-600">{"texte"}</div>
         <div className="col-span-4 text-gray-600">
           <span className="text-gray-400">Modifié le :</span>{" "}
           {infos.updated_at

@@ -38,7 +38,7 @@ const LoginForm = () => {
           .then((res) => {
             //Si la reponse est 200 on rempli le contexte et on redirige
             if (res.status === 200) {
-              setCurrentUser({ email: res.data.email, id: res.data.id });
+              setCurrentUser({ email: res.data.email, id: res.data.id, role: res.data.role });
               navigate("/");
               showToastMessage("Connexion réussie", "success");
             }

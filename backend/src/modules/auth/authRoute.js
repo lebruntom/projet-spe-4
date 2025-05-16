@@ -1,7 +1,5 @@
 import express from "express";
 import {
-    authGithubCallbackController,
-    authGoogleCallbackController,
     createDoubleAuthentification,
     loginUserController,
     registerUserController,
@@ -11,8 +9,6 @@ import {
     qrCodeStatusController,
     changePasswordController
 } from "./authController.js";
-import passport from "passport";
-
 
 
 //On initialise
@@ -35,18 +31,6 @@ authRoute.get("/logout", logoutController);
 //Change le mot de passe
 authRoute.post("/change-password", changePasswordController);
 
-// auth avec google
-authRoute.get(
-    "/auth/google",
-    passport.authenticate("google", {
-        scope: ["https://www.googleapis.com/auth/plus.login", "email", "profile"],
-    })
-);
-authRoute.get("/auth/google/callback", authGoogleCallbackController);
-
-//Auth avec github
-authRoute.get("/auth/github", passport.authenticate("github", {}));
-authRoute.get("/auth/github/callback", authGithubCallbackController);
 
 //Exportation des routes
 export default authRoute;

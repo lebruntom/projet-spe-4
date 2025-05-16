@@ -186,7 +186,7 @@ export default function Documents() {
       {folders.map((folder) => (
         <FolderRow key={folder.id} name={folder.name} id={folder.id} />
       ))}
-      {documents.length === 0 && folders.length === 0 && (
+      {documents.length === 0 && folders.length === 0 && files.length === 0 && (
         <p>Aucun document ou dossier partagé avec vous.</p>
       )}
       {documents.map((doc) => (

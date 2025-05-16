@@ -33,17 +33,6 @@ export async function registerUserController(req, res) {
     //On supprime l'email de la liste noire
     revokedEmails = revokedEmails.filter((element) => element !== email);
 
-    //On créé le token
-    var token = jwt.sign(
-      {
-        loggedIn: true,
-        email: email,
-        id: userExists.id,
-      },
-      secretKey,
-      { expiresIn: "1h" }
-    );
-    res.cookie("token", token, { sameSite: "Lax" });
     res.status(201).json({ message, email: email, id: userExists.id });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
@@ -68,6 +57,7 @@ export async function loginUserController(req, res) {
           loggedIn: true,
           id: id,
           email: email,
+          role: result.role
         },
         secretKey,
         { expiresIn: "1h" }
@@ -76,7 +66,7 @@ export async function loginUserController(req, res) {
 
       res
         .status(200)
-        .json({ message: "Authentication successful", email: email, id: id });
+        .json({ message: "Authentication successful", email: email, id: id, role: result.role });
     } else {
       res.status(401).json({ error: "Invalid email or password" });
     }
@@ -135,88 +125,6 @@ export async function verifyDoubleAuthentification(req, res) {
   }
 }
 
-//Controller auth google
-export function authGoogleCallbackController(req, res, next) {
-  passport.authenticate(
-    "google",
-    { failureRedirect: "http://localhost:3000/login" },
-    async (err, user) => {
-      if (err) {
-        return res.redirect("/"); // Redirect to an error page
-      }
-
-      try {
-        const email = user._json.email;
-        //Check si le user existe en bdd
-        const userExists = await checkUserExists(email);
-        //S'il n'existe pas on le créé
-        if (!userExists) {
-          await registerUserWithoutPassword(email);
-        }
-
-        //On supprime l'email de la liste noire
-        revokedEmails = revokedEmails.filter((element) => element !== email);
-
-        //Création du token
-        const token = jwt.sign(
-          {
-            loggedIn: true,
-            email: email,
-          },
-          secretKey,
-          { expiresIn: "1h" }
-        );
-        res.cookie("token", token, { sameSite: "Lax" });
-        // Successful authentication
-        res.redirect("http://localhost:3000"); // Redirect to the desired page
-      } catch (error) {
-        res.redirect("/error"); // Redirect to an error page
-      }
-    }
-  )(req, res, next);
-}
-
-//Controller auth github
-export function authGithubCallbackController(req, res) {
-  passport.authenticate(
-    "github",
-    { failureRedirect: "http://localhost:3000/login" },
-    async (err, user) => {
-      if (err) {
-        return res.redirect("/"); // Redirect to an error page
-      }
-
-      try {
-        const email = user.emails[0].value;
-        //Check si le user existe en bdd
-        const userExists = await checkUserExists(email);
-        //S'il n'existe pas on le créé
-        if (!userExists) {
-          await registerUserWithoutPassword(email);
-        }
-
-        //On supprime l'email de la liste noire
-        revokedEmails = revokedEmails.filter((element) => element !== email);
-
-        //Création du token
-        const token = jwt.sign(
-          {
-            loggedIn: true,
-            email: email,
-          },
-          secretKey,
-          { expiresIn: "1h" }
-        );
-        res.cookie("token", token, { sameSite: "Lax" });
-
-        // Successful authentication
-        res.redirect("http://localhost:3000"); // Redirect to the desired page
-      } catch (error) {
-        res.redirect("/error"); // Redirect to an error page
-      }
-    }
-  )(req, res);
-}
 
 //Controller check si le user est connecté
 export function userIsLoggedController(req, res) {

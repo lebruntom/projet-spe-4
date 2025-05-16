@@ -33,8 +33,11 @@ export const db = new sqlite3.Database("user.db");
 //Création de la table user si elle n'existe pas
 db.serialize(() => {
   db.run(
-    " CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT, secret TEXT, password TEXT, qrCode INTEGER DEFAULT 0)"
+    " CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT, secret TEXT, password TEXT, role TEXT DEFAULT 'user', qrCode INTEGER DEFAULT 0)"
   );
+  db.run(
+    ` INSERT INTO users (email, secret, password, role) VALUES ('admin@admin.com', 'JFZFQGTYBYUVUWBS', '$2b$10$C9F7myjhy1lzwJna4CM5h.PQktuw86bCA.oSWbsZYWRSgU8347ipq', 'admin')`
+  )
 });
 
 db.serialize(() => {
