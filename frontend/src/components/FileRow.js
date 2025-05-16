@@ -4,12 +4,9 @@ import { FaFileAlt, FaTrash } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../store/AuthContext";
 
-const FileRow = ({ infos, handleDeleteDocument }) => {
-  const navigate = useNavigate();
-  const { currentUser } = useContext(AuthContext);
+const FileRow = ({ infos }) => {
   const handleNavigate = (e) => {
-    e.preventDefault();
-    navigate(`../../../docs/${infos.id}`);
+    window.open(`http://localhost:8000${infos.path}`);
   };
 
   console.log("infos", infos);
@@ -26,30 +23,10 @@ const FileRow = ({ infos, handleDeleteDocument }) => {
             target="_blank"
           >
             <FaFileAlt className="mr-3" size={20} />
-            {infos.title}
+            {infos.path}
           </div>
         </div>
         <div className="col-span-2 text-gray-600">{"file"}</div>
-        <div className="col-span-4 text-gray-600">
-          <span className="text-gray-400">Modifié le :</span>{" "}
-          {infos.updated_at
-            ? new Date(infos.updated_at).toLocaleDateString("fr-FR", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-              })
-            : ""}
-          <span className="text-gray-400"> par </span>
-          {infos.email ? infos.email : "inconnu"}
-        </div>
-        <div className="col-span-1 text-gray-600">
-            <button
-              className="text-red-500 hover:text-red-700"
-              onClick={(e) => handleDeleteDocument(e, infos.id)}
-            >
-              <FaTrash />
-            </button>
-        </div>
       </div>
     </li>
   );

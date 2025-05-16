@@ -13,6 +13,7 @@ import folderRoutes from "./modules/folder/folderRoute.js";
 import { Server } from "socket.io";
 import setupSocket from "./socket.js";
 import http from "http";
+import uploadRoute from "./modules/upload/uploadRoute.js";
 
 const app = express();
 app.use(bodyParser.json());
@@ -77,6 +78,19 @@ db.serialize(() => {
     `);
 });
 
+db.serialize(() => {
+  db.run(`
+      CREATE TABLE IF NOT EXISTS file (
+        id TEXT PRIMARY KEY,
+        user_id INTEGER,
+        folder_id INTEGER,
+        path TEXT,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+        FOREIGN KEY (folder_id) REFERENCES folders(id)
+      )
+    `);
+});
+
 app.use(
   session({
     secret: "azertyuiop",
@@ -136,6 +150,8 @@ passport.deserializeUser((user, done) => {
 app.use(authRoute);
 app.use(documentRoutes);
 app.use(folderRoutes);
+app.use(uploadRoute);
+app.use("/uploads", express.static("uploads"));
 
 const server = http.createServer(app);
 const io = new Server(server, {

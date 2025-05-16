@@ -4,10 +4,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../store/AuthContext";
 import Button from "../components/ui/Button";
 import FolderRow from "../components/FolderRow";
-import FileRow from "../components/FileRow";
+import DocumentRow from "../components/DocumentRow";
 import ModalNewFolder from "../components/ModalNewFolder";
 import { v4 as uuidV4 } from "uuid";
 import { showToastMessage } from "../utils/common";
+import FileUpload from "../components/FileUpload";
+import FileRow from "../components/FileRow";
 
 export default function Documents() {
   const location = useLocation();
@@ -15,6 +17,7 @@ export default function Documents() {
   const [folders, setFolders] = useState([]);
   const { currentUser } = useContext(AuthContext);
   const [showModal, setShowModal] = useState(false);
+  const [files, setFiles] = useState([]);
   const navigate = useNavigate();
 
   const loadFolders = () => {
@@ -68,6 +71,24 @@ export default function Documents() {
       })
       .catch((err) => {
         console.error("Erreur récupération documents", err);
+      });
+
+      axios.get(`http://localhost:8000/files/${currentUser.id}/folder/${ location.pathname.split("/")[
+        location.pathname.split("/").length - 1
+      ] !== "documents"
+        ? parseInt(
+            location.pathname.split("/")[
+              location.pathname.split("/").length - 1
+            ]
+          )
+        : "null"}`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        setFiles(res.data);
+      })
+      .catch((err) => {
+        console.error("Erreur récupération des fichiers", err);
       });
 
     loadFolders();
@@ -143,6 +164,7 @@ export default function Documents() {
         >
           Créer un dossier
         </Button>
+        <FileUpload />
       </div>
       {showModal && (
         <ModalNewFolder
@@ -158,10 +180,16 @@ export default function Documents() {
         <p>Aucun document ou dossier partagé avec vous.</p>
       )}
       {documents.map((doc) => (
-        <FileRow
+        <DocumentRow
           key={doc.id}
           infos={doc}
           handleDeleteDocument={handleDeleteDocument}
+        />
+      ))}
+      {files.map((file) => (
+        <FileRow
+          key={file.id}
+          infos={file}
         />
       ))}
     </div>
